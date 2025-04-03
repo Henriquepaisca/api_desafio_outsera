@@ -1,6 +1,6 @@
 # API Desafio Outsera
 
-Este projeto é uma API desenvolvida com **FastAPI** para processar e servir dados a partir de um arquivo CSV e um banco de dados.
+Este projeto é uma API desenvolvida com **FastAPI** para processar e servir dados a partir de um arquivo CSV e um banco de dados em memória.
 
 ## 📌 **Requisitos**
 
