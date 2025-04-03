@@ -24,9 +24,11 @@ def get_db():
 CSV_PATH = os.path.join(os.path.dirname(__file__), "./static/Movielist.csv")
 
 # Carregar os dados do CSV e inserir no banco
-def load_csv_to_db(db: Session):
+def load_csv_to_db(db: Session, csv_path: str = CSV_PATH):
+
+    print(csv_path)
     if db.query(Movie).first() is None:
-        df = pd.read_csv(CSV_PATH, sep=";")
+        df = pd.read_csv(csv_path, sep=";")
 
         df = df.where(pd.notna(df), None)
 
@@ -39,7 +41,6 @@ def load_csv_to_db(db: Session):
                 winner=True if row["winner"] == "yes" else False
             )
             db.add(movie)
-
         db.commit()
     db.close()
 

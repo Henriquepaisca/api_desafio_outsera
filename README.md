@@ -93,7 +93,5 @@ api-outsera/
 - [Pandas](https://pandas.pydata.org/)
 - [Pytest](https://docs.pytest.org/)
 
----
 
-💡 **Dúvidas ou melhorias?** Fique à vontade para contribuir com o projeto!
 
