@@ -7,7 +7,7 @@ from sqlalchemy import create_engine, inspect
 from sqlalchemy.orm import sessionmaker
 from pathlib import Path
 
-from app.main import Base, app, get_db, load_csv_to_db
+from app.main import Base, app, get_db, load_csv_to_db, CSV_PATH
 from app.models import Movie
 
 STATUS_OK = 200
@@ -53,17 +53,34 @@ def test_get_award_intervals(test_db):
     response = test_db.get("/awards/intervals")
     assert response.status_code == STATUS_OK
     data = response.json()
+    
     assert "min" in data
     assert "max" in data
-    if data["min"]:
-        producer_min = data["min"][0]
-        assert "producer" in producer_min
-        assert "interval" in producer_min
-        assert "previousWin" in producer_min
-        assert "followingWin" in producer_min
-    if data["max"]:
-        producer_max = data["max"][0]
-        assert "producer" in producer_max
-        assert "interval" in producer_max
-        assert "previousWin" in producer_max
-        assert "followingWin" in producer_max
+
+    assert isinstance(data["max"], dict)
+    assert isinstance(data["min"], dict)
+
+    for key in ["producer", "interval", "previousWin", "followingWin"]:
+        assert key in data["max"]
+        assert key in data["min"]
+
+    assert data["max"]["producer"] == "Matthew Vaughn"
+    assert data["max"]["interval"] == 13
+    assert data["max"]["previousWin"] == 2002
+    assert data["max"]["followingWin"] == 2015
+
+    assert data["min"]["producer"] == "Joel Silver"
+    assert data["min"]["interval"] == 1
+    assert data["min"]["previousWin"] == 1990
+    assert data["min"]["followingWin"] == 1991
+
+
+import pandas as pd
+
+def test_csv_headers():
+    headers = ["year", "title", "studios", "producers", "winner"]
+    df = pd.read_csv(CSV_PATH, sep=";", nrows=0)
+
+    actual_headers = df.columns.tolist()
+
+    assert actual_headers == headers, f"Headers incorretos. Esperado: {headers}, Encontrado: {actual_headers}"
