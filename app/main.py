@@ -10,8 +10,21 @@ from .database import Base, SessionLocal, engine
 from .models import Movie
 import logging
 
+from contextlib import asynccontextmanager
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    logger.info("🔄 Inicializando aplicação...")
+
+    db = SessionLocal()
+    load_csv_to_db(db)
+    
+    logger.info("✅ Banco carregado com sucesso.")
+
+    yield
+
+app = FastAPI(lifespan=lifespan)
 
 Base.metadata.create_all(bind=engine)
 
@@ -69,26 +82,6 @@ def parse_producers(producers_str):
     return producers
 
 
-# Chamar a função para carregar os dados ao iniciar a API
-# db = SessionLocal()
-# load_csv_to_db(db)
-
-@app.on_event("startup")
-def startup_event():
-    logger.info("🔄 Inicializando aplicação...")
-
-    logger.info("🔄 Limpando o banco e recarregando os dados...")
-    db = SessionLocal()
-
-    # Deleta tudo da tabela Movie
-    db.query(Movie).delete()
-    db.commit()
-
-    db = SessionLocal()
-    load_csv_to_db(db)
-    logger.info("✅ Banco carregado com sucesso.")
-
-
 @app.get("/")
 def read_root():
     return {'message': 'API para desafio Outsera!'}
@@ -97,8 +90,6 @@ def read_root():
 @app.get("/awards/intervals", response_model=Dict[str, Any])
 def get_award_intervals(db: Session = Depends(get_db)):
     movies_winners: Movie = db.query(Movie).filter(Movie.winner == True).order_by(Movie.year).all()
-
-
     producer_wins: Dict = {}
 
     for movie in movies_winners:
@@ -125,14 +116,21 @@ def get_award_intervals(db: Session = Depends(get_db)):
     if not producer_intervals:
         return {"min": [], "max": []}
 
-    # min_interval = min([p["interval"] for p in producer_intervals]) if producer_intervals else 0
-    # max_interval = max([p["interval"] for p in producer_intervals]) if producer_intervals else 0
+    max_interval = None
+    max_value = float('-inf')
 
-    # min_producers = [p for p in producer_intervals if p["interval"] == min_interval]
-    # max_producers = [p for p in producer_intervals if p["interval"] == max_interval]
+    for item in producer_intervals:
+        if item["interval"] > max_value:
+            max_value = item["interval"]
+            max_interval = item
+    
+    min_interval = None
+    min_value = float('inf')  
 
-    max_interval = max(producer_intervals, key=lambda x: x["interval"])
-    min_interval = min(producer_intervals, key=lambda x: x["interval"])
+    for item in producer_intervals:
+        if item["interval"] < min_value:
+            min_value = item["interval"]
+            min_interval = item
 
     return {
         "max": max_interval,

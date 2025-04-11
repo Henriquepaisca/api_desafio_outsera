@@ -15,8 +15,8 @@ Antes de iniciar, certifique-se de ter instalado:
 1. Clone o repositório:
 
 ```bash
-    git clone https://github.com/Henriquepaisca/api-outsera.git
-    cd api-outsera
+    git clone https://github.com/Henriquepaisca/api_desafio_outsera.git
+    cd api-desafio_outsera
 ```
 
 2. Crie e ative um ambiente virtual (opcional, mas recomendado):
