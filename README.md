@@ -16,7 +16,7 @@ Antes de iniciar, certifique-se de ter instalado:
 
 ```bash
     git clone https://github.com/Henriquepaisca/api_desafio_outsera.git
-    cd api-desafio_outsera
+    cd api_desafio_outsera
 ```
 
 2. Crie e ative um ambiente virtual (opcional, mas recomendado):
